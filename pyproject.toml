@@ -1,0 +1,21 @@
+[tool.poetry]
+name = "mergergraphnet"
+version = "0.1.0"
+description = ""
+authors = ["CagataySavasli <cagatay.savasli@ozu.edu.tr>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+pandas = "^2.2.3"
+torch = "^2.6.0"
+scikit-learn = "^1.6.1"
+nltk = "^3.9.1"
+torch-geometric = "^2.6.1"
+pyyaml = "^6.0.2"
+notebook = "^7.3.2"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
