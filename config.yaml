@@ -1,0 +1,15 @@
+project:
+  name: "MergerGraphNet"
+  description: "MergerGraphNet utilizes TF-IDF embeddings and Graph Neural Networks (GNNs) to predict corporate mergers from 10-K MD&A text. It builds financial knowledge graphs, extracts key insights using TF-IDF-based embeddings, and identifies acquisition targets. Scalable and efficient, it bridges financial text mining with graph-based learning."
+  developer: "Cagatay Savasli"
+  email: "cagatay.savasli@ozu.edu.tr"
+
+data_loader:
+  graph_n_sentence_connection: 5
+  strategy: "sentences"
+
+models:
+  input_dim: 8192
+  hidden_dim_1: 1024
+  hidden_dim_2: 128
+  hidden_dim_3: 32
