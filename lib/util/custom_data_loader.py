@@ -23,7 +23,8 @@ class CustomDataset(torch.utils.data.Dataset):
 
         # Cümle sayısını, mda sütunundaki cümle listesine göre belirliyoruz.
         num_sentences = len(row['sentences'])
-        label = row['label']
+        label =torch.tensor([row['label']])
+
 
         # Her cümlenin TF-IDF vektörünü torch tensor'a dönüştürüyoruz.
         x = torch.stack(
@@ -54,10 +55,10 @@ class CustomDataset(torch.utils.data.Dataset):
 
     def get_sentences(self, row):
         sentence_vectors = row['tfidf_sentence']
-        sentence_vectors = sentence_vectors.toarray()
+        #sentence_vectors = sentence_vectors.toarray()
 
         num_sentences = sentence_vectors.shape[0]
-        label = row['label']
+        label = torch.tensor([row['label']])
 
         data = torch.stack(
             [torch.tensor(sentence_vectors[i], dtype=torch.float) for i in range(num_sentences)],
@@ -71,7 +72,7 @@ class CustomDataset(torch.utils.data.Dataset):
         report_vector = row['tfidf_mda']
         report_vector = report_vector.toarray()
 
-        label = row['label']
+        label =torch.tensor([row['label']])
         data = torch.tensor(report_vector, dtype=torch.float)
 
         return data, label
