@@ -15,7 +15,7 @@ class GraphDataLoader(torch.utils.data.Dataset):
         sentence_vectors = sentence_vectors.toarray()
 
         # Cümleler arası cosine similarity hesaplanıyor.
-        similarity_matrix = cosine_similarity(sentence_vectors)
+        #similarity_matrix = cosine_similarity(sentence_vectors)
 
         # Cümle sayısını, mda sütunundaki cümle listesine göre belirliyoruz.
         num_sentences = len(row['sentences'])
@@ -35,7 +35,8 @@ class GraphDataLoader(torch.utils.data.Dataset):
             for j in range(max(0, i - self.n), min(num_sentences, i + self.n + 1)):
                 if i != j:
                     edge_list.append([i, j])
-                    edge_attr.append(similarity_matrix[i][j])
+                    #edge_attr.append(similarity_matrix[i][j])
+                    edge_attr.append(1/abs(i-j))
 
         if len(edge_list) > 0:
             edge_index = torch.tensor(edge_list, dtype=torch.long).t().contiguous()
