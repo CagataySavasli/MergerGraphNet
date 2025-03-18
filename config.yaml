@@ -6,7 +6,11 @@ project:
 
 data_loader:
   graph_n_sentence_connection: 5
-  strategy: "sentences"
+  strategy: "graph"
+
+embedding:
+  model_version: "FinBERT"
+  model_name: "yiyanghkust/finbert-tone"
 
 models:
   input_dim: 8192
