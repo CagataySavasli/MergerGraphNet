@@ -34,6 +34,55 @@ class GraphClassifier(nn.Module):
         out = self.fc(graph_rep)
         return out
 
+
+class GraphResidualClassifier(nn.Module):
+    def __init__(self, input_dim, hidden_dim_1, hidden_dim_2, hidden_dim_3, output_dim):
+        super(GraphResidualClassifier, self).__init__()
+
+        # İlk katmanda GAT ve GCN birlikte kullanılacak
+        self.gat1 = GATConv(in_channels=input_dim, out_channels=hidden_dim_1)
+        self.gcn1 = GCNConv(input_dim, hidden_dim_1)
+        self.lin1 = nn.Linear(input_dim, hidden_dim_1)  # Residual için lineer dönüşüm
+
+        # İkinci katmanda yine hem GAT hem GCN
+        self.gat2 = GATConv(in_channels=hidden_dim_1, out_channels=hidden_dim_2)
+        self.gcn2 = GCNConv(hidden_dim_1, hidden_dim_2)
+        self.lin2 = nn.Linear(hidden_dim_1, hidden_dim_2)
+
+        # Son katmanda sınıflandırma için GAT ve GCN birlikte kullanılacak
+        self.gat3 = GATConv(in_channels=hidden_dim_2, out_channels=hidden_dim_3)
+        self.gcn3 = GCNConv(hidden_dim_2, hidden_dim_3)
+        self.lin3 = nn.Linear(hidden_dim_2, hidden_dim_3)
+
+        self.lin4 = nn.Linear(hidden_dim_3, output_dim)
+
+
+    def forward(self, data):
+        # İlk katman
+        x, edge_index, batch = data.x, data.edge_index, data.batch
+
+        gat_out1 = self.gat1(x, edge_index)
+        gcn_out1 = self.gcn1(x, edge_index)
+        x = torch.relu(gat_out1 + gcn_out1 + self.lin1(x))  # Residual connection
+        #x = F.dropout(x, p=self.dropout, training=self.training)
+
+        # İkinci katman
+        gat_out2 = self.gat2(x, edge_index)
+        gcn_out2 = self.gcn2(x, edge_index)
+        x = torch.relu(gat_out2 + gcn_out2 + self.lin2(x))  # Residual connection
+        #x = F.dropout(x, p=self.dropout, training=self.training)
+
+        # Son katman (sınıflandırma için)
+        gat_out3 = self.gat3(x, edge_index)
+        gcn_out3 = self.gcn3(x, edge_index)
+        x = gat_out3 + gcn_out3 + self.lin3(x)  # Residual connection
+
+        x = global_mean_pool(x, batch)
+
+        out = self.lin4(x)
+
+        return out
+
 class GraphLSTMClassifier(nn.Module):
     def __init__(self, input_dim, hidden_dim_1, hidden_dim_2, lstm_hidden_dim, output_dim):
         """
