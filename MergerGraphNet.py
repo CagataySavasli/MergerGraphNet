@@ -27,6 +27,7 @@ hidden_dim_1 = config['models']['hidden_dim_1']
 hidden_dim_2 = config['models']['hidden_dim_2']
 hidden_dim_3 = config['models']['hidden_dim_3']
 #%%
+print("Start Preprocess")
 df = pd.read_csv('./data/processed/reports_labeled.csv')
 
 # df = df.loc[:100].copy()
@@ -74,6 +75,7 @@ print("Train Sentence: ")
 train_df['tfidf_sentence'] = train_df['sentences'].progress_apply(get_tfidf_embeddings)
 print("Test Sentence: ")
 test_df['tfidf_sentence'] = test_df['sentences'].progress_apply(get_tfidf_embeddings)
+print("End Getting Tfidf Embeddings")
 #%%
 train_dataset = GraphDataLoader(train_df, 10)
 test_dataset = GraphDataLoader(test_df, 10)
@@ -153,6 +155,7 @@ elif model_name == 'GraphResidualClassifier':
 optimizer = optim.Adam(model.parameters(), lr=0.0005)
 criterion = nn.CrossEntropyLoss(weight=class_weights)
 
+print("Start Training")
  #Eğitim döngüsü
 num_epochs = 15
 for epoch in range(1, num_epochs + 1):
@@ -163,6 +166,7 @@ for epoch in range(1, num_epochs + 1):
     if epoch % 3 == 0 or epoch == num_epochs or epoch == 1:
         print(f"Epoch: {epoch:02d}, Loss: {loss:.4f} | Test | Accuracy: {accuracy}, Precision: {precision}, Recall: {recall}, F1: {f1} | TP: {tp}, TN: {tn}, FP: {fp}, FN: {fn}")
 
+print("End Training")
 # torch.save(model.state_dict(), f'./outputs/{model_name}.pth')
 result_dict['Model'].append(model_name)
 result_dict['Accuracy'].append(accuracy)
@@ -175,5 +179,7 @@ result_dict['FP'].append(fp)
 result_dict['FN'].append(fn)
 
 result_df = pd.DataFrame(data=result_dict)
-
+print("Results:")
+print(result_df)
 result_df.to_csv(f'./outputs/{model_name}_results_15.csv', index=False)
+print("Done!")
