@@ -15,6 +15,7 @@ import numpy as np
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, confusion_matrix
 from tqdm import tqdm
+import sys
 # device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 device = torch.device("cpu")
@@ -22,7 +23,7 @@ device = torch.device("cpu")
 config = ConfigLoader().load_config()
 tqdm.pandas()
 #%%
-strategy = "LSTM"
+strategy = sys.argv[1]# "LSTM"
 #%%
 input_dim = config['models']['input_dim']
 hidden_dim_1 = config['models']['hidden_dim_1']
