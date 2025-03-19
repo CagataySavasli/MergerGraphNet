@@ -170,6 +170,7 @@ for epoch in range(1, num_epochs + 1):
 
     print(f"Epoch: {epoch:02d}, Loss: {loss:.4f} | Test | Accuracy: {accuracy}, Precision: {precision}, Recall: {recall}, F1: {f1} | TP: {tp}, TN: {tn}, FP: {fp}, FN: {fn}")
 #%%
+result_dict['Model'].append('SentenceClassiferLSTM')
 result_dict['Accuracy'].append(accuracy)
 result_dict['Precision'].append(precision)
 result_dict['Recall'].append(recall)
