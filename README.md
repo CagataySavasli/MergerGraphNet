@@ -6,6 +6,19 @@
 
 This project is designed as a **binary classification task**, predicting whether a company will **merge** or **not merge** based on financial disclosures.
 
+## 📊 Result Table
+
+| Model                  | Approach     | Accuracy   | Precision | Recall     | F1         | TP     | TN       | FP      | FN      |
+|------------------------|--------------|------------|-----------|------------|------------|--------|----------|---------|---------|
+| Gaussian NB            | Report       | 0.5195     | 0.1998    | 0.7252     | 0.3133     | 219    | 819      | 877     | 83      |
+| Logistic Regression    | Report       | 0.8493     | 0.6667    | 0.0066     | 0.0131     | 2      | 1695     | 1       | 300     |
+| Random Forest          | Report       | 0.8544     | 0.6667    | 0.0728     | 0.1313     | 22     | 1685     | 11      | 280     |
+| XGBoost                | Report       | 0.8438     | 0.4242    | 0.0927     | 0.1522     | 28     | 1658     | 38      | 274     |
+| GraphLSTMClassifier    | Sentence     | 0.8303     | 0.3238    | 0.1126     | 0.1671     | 34     | 1625     | 71      | 268     |
+| **GraphClassifier**    | **Sentence** | **0.7893** | **0.272** | **0.2351** | **0.2522** | **71** | **1506** | **190** | **231** |
+| SentenceClassifierLSTM | Sentence     | 0.8233     | 0.2821    | 0.1093     | 0.1575     | 33     | 1612     | 84      | 269     |
+
+
 ## 🚀 Features
 
 - **📊 Graph-Based Representation:** Constructs company-entity relationships from financial reports.
