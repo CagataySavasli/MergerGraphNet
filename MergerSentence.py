@@ -2,7 +2,7 @@
 from nltk.tokenize import sent_tokenize
 
 from lib.util.embedding_data_loader import EmbeddingDataLoader
-from lib.model.sentence_classifer import SentenceEmbeddingClassifier
+from lib.model.sentence_classifer import SentenceLSTMClassifier, SentenceTransClassifier
 from lib.config.config_loader import ConfigLoader
 
 import torch
@@ -21,6 +21,8 @@ device = torch.device("cpu")
 
 config = ConfigLoader().load_config()
 tqdm.pandas()
+#%%
+strategy = "LSTM"
 #%%
 input_dim = config['models']['input_dim']
 hidden_dim_1 = config['models']['hidden_dim_1']
@@ -156,7 +158,10 @@ result_dict = {
 
 #for model_name in ['GraphClassifier', 'GraphResidualClassifier', 'GraphLSTMClassifier']: #, 'GraphTransClassifier'
 
-model = SentenceEmbeddingClassifier(input_dim=input_dim, fc1_dim=hidden_dim_1, fc2_dim=hidden_dim_2, lstm_hidden_dim=hidden_dim_3, output_dim=2).to(device)
+if strategy == "LSTM":
+    model = SentenceLSTMClassifier(input_dim=input_dim, fc1_dim=hidden_dim_1, fc2_dim=hidden_dim_2, lstm_hidden_dim=hidden_dim_3, output_dim=2).to(device)
+elif strategy == "SentenceTrans":
+    model = SentenceTransClassifier(input_dim=input_dim, fc1_dim=hidden_dim_1, fc2_dim=hidden_dim_2, transformer_hidden_dim=hidden_dim_3, output_dim=2).to(device)
 
 optimizer = optim.Adam(model.parameters(), lr=0.0005)
 criterion = nn.CrossEntropyLoss(weight=class_weights)
