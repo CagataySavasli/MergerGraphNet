@@ -50,3 +50,4 @@ Feel free to open an **issue**, submit a **pull request**, or discuss improvemen
 - **Ahmet Çağatay Savaşlı** – Developer
 - **Prof. Dr. Emre Sefer** – Advisor
 
+*This project was developed within the [OzU Machine Learning in Finance and Bioinformatics Lab](https://ozu-mlfinbio-lab.github.io/).*
