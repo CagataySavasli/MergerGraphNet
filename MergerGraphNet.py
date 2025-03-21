@@ -16,6 +16,8 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, confusion_matrix
 from tqdm import tqdm
 import sys
+import ast
+
 # device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 device = torch.device('cpu')
 
@@ -39,6 +41,7 @@ if embedding_type == 'tfidf':
 
 else:
     df = pd.read_csv('./data/processed/embedded_labeled.csv')
+    df['embeddings'] = df['embeddings'].apply(ast.literal_eval)
 
 
 train_df = df[df['year'] <= 2019].copy().reset_index(drop=True)
