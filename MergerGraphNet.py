@@ -26,17 +26,20 @@ input_dim = config['models']['input_dim']
 hidden_dim_1 = config['models']['hidden_dim_1']
 hidden_dim_2 = config['models']['hidden_dim_2']
 hidden_dim_3 = config['models']['hidden_dim_3']
+
+model_name = sys.argv[1]#'GraphResidualClassifier'
+embedding_type = sys.argv[2]#'tfidf'
 #%%
 print("Start Preprocess")
-df = pd.read_csv('./data/processed/reports_labeled.csv')
+if embedding_type == 'tfidf':
+    df = pd.read_csv('./data/processed/reports_labeled.csv')
 
-# df = df.loc[:100].copy()
+    df.reset_index(drop=True, inplace=True)
+    df['sentences'] = df['mda'].progress_apply(lambda x: sent_tokenize(x))
 
-df.reset_index(drop=True, inplace=True)
-df['sentences'] = df['mda'].progress_apply(lambda x: sent_tokenize(x))
+else:
+    df = pd.read_csv('./data/processed/embedded_labeled.csv')
 
-# train_df = df.loc[:80].copy().reset_index(drop=True)
-# test_df = df.loc[80:].copy().reset_index(drop=True)
 
 train_df = df[df['year'] <= 2019].copy().reset_index(drop=True)
 test_df = df[df['year'] > 2019].copy().reset_index(drop=True)
@@ -60,22 +63,23 @@ Number of merge in test set: {len(test_df[test_df['label'] == 1]['label'])}
 Number of not-merge in test set: {len(test_df[test_df['label'] == 0]['label'])}
 """)
 #%%
-train_corpus = [sentence for sentences in train_df['sentences'] for sentence in sentences]
+if embedding_type == 'tfidf':
+    train_corpus = [sentence for sentences in train_df['sentences'] for sentence in sentences]
 
-vectorizer = TfidfVectorizer(max_features=input_dim, stop_words='english')
-vectorizer.fit(train_corpus)
+    vectorizer = TfidfVectorizer(max_features=input_dim, stop_words='english')
+    vectorizer.fit(train_corpus)
 
-def get_tfidf_embeddings(sentence_list):
-    if not type(sentence_list) == list:
-        sentence_list = [sentence_list]
-    embeddings = vectorizer.transform(sentence_list)
-    return embeddings
+    def get_tfidf_embeddings(sentence_list):
+        if not type(sentence_list) == list:
+            sentence_list = [sentence_list]
+        embeddings = vectorizer.transform(sentence_list)
+        return embeddings
 
-print("Train Sentence: ")
-train_df['tfidf_sentence'] = train_df['sentences'].progress_apply(get_tfidf_embeddings)
-print("Test Sentence: ")
-test_df['tfidf_sentence'] = test_df['sentences'].progress_apply(get_tfidf_embeddings)
-print("End Getting Tfidf Embeddings")
+    print("Train Sentence: ")
+    train_df['embeddings'] = train_df['sentences'].progress_apply(get_tfidf_embeddings)
+    print("Test Sentence: ")
+    test_df['embeddings'] = test_df['sentences'].progress_apply(get_tfidf_embeddings)
+    print("End Getting Tfidf Embeddings")
 #%%
 train_dataset = GraphDataLoader(train_df, 10)
 test_dataset = GraphDataLoader(test_df, 10)
@@ -139,7 +143,6 @@ result_dict = {
     "FN": []
 }
 
-model_name =sys.argv[1]#'GraphResidualClassifier'
 print("Training Model: ", model_name)
 # Model, optimizer ve loss function tanımlanıyor
 
@@ -181,5 +184,5 @@ result_dict['FN'].append(fn)
 result_df = pd.DataFrame(data=result_dict)
 print("Results:")
 print(result_df)
-result_df.to_csv(f'./outputs/{model_name}_results_15.csv', index=False)
+result_df.to_csv(f'./outputs/{model_name}_{embedding_type}_results.csv', index=False)
 print("Done!")
