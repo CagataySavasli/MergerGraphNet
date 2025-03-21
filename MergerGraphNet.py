@@ -2,6 +2,7 @@
 from nltk.tokenize import sent_tokenize
 
 from lib.util.graph_data_loader import GraphDataLoader
+from lib.util.graph_iterable_data_loader import GraphIterableDataset
 from lib.model.graph_classifer import GraphClassifier, GraphResidualClassifier, GraphLSTMClassifier, GraphTransClassifier
 from lib.config.config_loader import ConfigLoader
 
@@ -85,8 +86,15 @@ if embedding_type == 'tfidf':
     test_df['embeddings'] = test_df['sentences'].progress_apply(get_tfidf_embeddings)
     print("End Getting Tfidf Embeddings")
 #%%
-train_dataset = GraphDataLoader(train_df, 10)
-test_dataset = GraphDataLoader(test_df, 10)
+if embedding_type == 'tfidf':
+    train_dataset = GraphDataLoader(train_df, 10)
+    test_dataset = GraphDataLoader(test_df, 10)
+else:
+    train_csv = 'data/processed/embedded_labeled_train.csv'
+    test_csv = 'data/processed/embedded_labeled_test.csv'
+
+    train_dataset = GraphIterableDataset(train_csv, chunk_size=128, n=10)
+    test_dataset = GraphIterableDataset(test_csv, chunk_size=128, n=10)
 #%%
 train_loader = DataLoader(train_dataset, batch_size=16, shuffle=True)
 test_loader = DataLoader(test_dataset, batch_size=16, shuffle=False)
