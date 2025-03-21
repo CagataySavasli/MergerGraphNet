@@ -77,7 +77,7 @@ if embedding_type == 'tfidf':
         if not type(sentence_list) == list:
             sentence_list = [sentence_list]
         embeddings = vectorizer.transform(sentence_list)
-        return embeddings
+        return embeddings.toarray()
 
     print("Train Sentence: ")
     train_df['embeddings'] = train_df['sentences'].progress_apply(get_tfidf_embeddings)

@@ -13,7 +13,7 @@ class EmbeddingDataLoader(torch.utils.data.Dataset):
 
     def get_sentences(self, row):
         sentence_vectors = row['embeddings']
-        sentence_vectors = sentence_vectors.toarray()  # Dense array'e çevirme
+        sentence_vectors = sentence_vectors#.toarray()  # Dense array'e çevirme
         num_sentences = sentence_vectors.shape[0]
         label = torch.tensor([row['label']])
 

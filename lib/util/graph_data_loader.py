@@ -12,7 +12,7 @@ class GraphDataLoader(torch.utils.data.Dataset):
     def get_graph(self, row):
         # TF-IDF vektörlerini alıyoruz. Eğer sparse ise dense formata çeviriyoruz.
         sentence_vectors = row['embeddings']
-        sentence_vectors = sentence_vectors.toarray()
+        sentence_vectors = sentence_vectors#.toarray()
 
         # Cümleler arası cosine similarity hesaplanıyor.
         #similarity_matrix = cosine_similarity(sentence_vectors)
