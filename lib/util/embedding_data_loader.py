@@ -12,7 +12,7 @@ class EmbeddingDataLoader(torch.utils.data.Dataset):
         self.n = self.config['data_loader']['graph_n_sentence_connection']
 
     def get_sentences(self, row):
-        sentence_vectors = row['tfidf_sentence']
+        sentence_vectors = row['embeddings']
         sentence_vectors = sentence_vectors.toarray()  # Dense array'e çevirme
         num_sentences = sentence_vectors.shape[0]
         label = torch.tensor([row['label']])
