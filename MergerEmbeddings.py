@@ -9,9 +9,10 @@ for idx in range(0, 14000, 100):
     print(f"{round(((idx+100)/14000), 2)*100}%")
     if os.path.isfile(f'./data/sep/embeddings_labeled_{idx}_{idx+100}.json'):
         tmp = pd.read_json(f'./data/sep/embeddings_labeled_{idx}_{idx+100}.json')
-        tmp = tmp[['form', 'year', 'embeddings', 'label']].copy()
-        tmp['embeddings'] = tmp['embeddings'].apply(lambda x: list(np.array(x).astype(np.float16)))
-        frames.append(tmp)
+        if len(tmp) >= 5:
+            tmp = tmp[['form', 'year', 'embeddings', 'label']].copy()
+            tmp['embeddings'] = tmp['embeddings'].apply(lambda x: list(np.array(x).astype(np.float16)))
+            frames.append(tmp)
     else:
         not_founds.append(f"embeddings_labeled_{idx}_{idx+100}.json")
 
