@@ -1,6 +1,7 @@
 from lib.util.graph_generator import GraphGenerator
 from sklearn.metrics.pairwise import cosine_similarity
 from lib.config.config_loader import ConfigLoader
+import torch
 
 class GraphDataLoader(torch.utils.data.Dataset):
     def __init__(self, df, n):

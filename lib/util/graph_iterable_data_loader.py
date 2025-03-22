@@ -1,7 +1,7 @@
 from lib.util.graph_generator import GraphGenerator
 import pandas as pd
 import numpy as np
-
+import torch
 
 class GraphIterableDataset(torch.utils.data.IterableDataset):
     def __init__(self, csv_file, chunk_size=1000, n=10):
@@ -25,8 +25,6 @@ class GraphIterableDataset(torch.utils.data.IterableDataset):
             row['embeddings'] = row['embeddings']
 
         return self.graph_generator(row)
-
-
 
     def __iter__(self):
         # CSV'yi belirli boyutlarda (chunk_size) okuyarak her satır için örnek üretiyoruz.
