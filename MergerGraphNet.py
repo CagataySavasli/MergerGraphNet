@@ -68,17 +68,18 @@ Number of merge in test set: {len(test_df[test_df['label'] == 1]['label'])}
 Number of not-merge in test set: {len(test_df[test_df['label'] == 0]['label'])}
 """)
 #%%
+
+def get_tfidf_embeddings(sentence_list):
+    if not type(sentence_list) == list:
+        sentence_list = [sentence_list]
+    embeddings = vectorizer.transform(sentence_list)
+    return embeddings.toarray()
+
 if embedding_type == 'tfidf':
     train_corpus = [sentence for sentences in train_df['sentences'] for sentence in sentences]
 
     vectorizer = TfidfVectorizer(max_features=input_dim, stop_words='english')
     vectorizer.fit(train_corpus)
-
-    def get_tfidf_embeddings(sentence_list):
-        if not type(sentence_list) == list:
-            sentence_list = [sentence_list]
-        embeddings = vectorizer.transform(sentence_list)
-        return embeddings.toarray()
 
     print("Train Sentence: ")
     train_df['embeddings'] = train_df['sentences'].progress_apply(get_tfidf_embeddings)
@@ -96,8 +97,8 @@ else:
     train_dataset = GraphIterableDataset(train_csv, chunk_size=128, n=10)
     test_dataset = GraphIterableDataset(test_csv, chunk_size=128, n=10)
 #%%
-train_loader = DataLoader(train_dataset, batch_size=16, shuffle=True)
-test_loader = DataLoader(test_dataset, batch_size=16, shuffle=False)
+train_loader = DataLoader(train_dataset, batch_size=16)
+test_loader = DataLoader(test_dataset, batch_size=16)
 #%%
 def evaluate(y_true, y_pred):
     accuracy = round(accuracy_score(y_true, y_pred), 4)
