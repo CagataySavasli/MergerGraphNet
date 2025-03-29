@@ -3,6 +3,9 @@ from torch_geometric.data import Data
 
 class GraphGenerator(torch.utils.data.Dataset):
 
+    def __init__(self, n=5):
+        self.n = n
+
     def get_graph(self, row):
         # TF-IDF vektörlerini alıyoruz. Eğer sparse ise dense formata çeviriyoruz.
         sentence_vectors = row['embeddings']
