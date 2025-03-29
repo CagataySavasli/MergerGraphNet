@@ -94,6 +94,8 @@ else:
 
     print("BERT will be used for embedding!!")
 
+    class_weights = torch.tensor([4.488888888888889, 1.286624203821656], dtype=torch.float).to(device)
+
     train_csv = 'data/processed/embedded_labeled_train.csv'
     test_csv = 'data/processed/embedded_labeled_test.csv'
 
