@@ -40,57 +40,60 @@ if embedding_type == 'tfidf':
     df.reset_index(drop=True, inplace=True)
     df['sentences'] = df['mda'].progress_apply(lambda x: sent_tokenize(x))
 
-else:
-    df = pd.read_csv('./data/processed/embedded_labeled.csv')
-    env = {"array": np.array, "float16": np.float16}
-    df['embeddings'] = df['embeddings'].apply(lambda x: eval(x, env))
+# else:
+#     df = pd.read_csv('./data/processed/embedded_labeled.csv')
+#     env = {"array": np.array, "float16": np.float16}
+#     df['embeddings'] = df['embeddings'].apply(lambda x: eval(x, env))
 
 
-train_df = df[df['year'] <= 2019].copy().reset_index(drop=True)
-test_df = df[df['year'] > 2019].copy().reset_index(drop=True)
+    train_df = df[df['year'] <= 2019].copy().reset_index(drop=True)
+    test_df = df[df['year'] > 2019].copy().reset_index(drop=True)
 
-merge_class_weight = len(train_df) / len(train_df[train_df['label'] == 1]['label'])
-not_merge_class_weight = len(train_df) / len(train_df[train_df['label'] == 0]['label'])
+    merge_class_weight = len(train_df) / len(train_df[train_df['label'] == 1]['label'])
+    not_merge_class_weight = len(train_df) / len(train_df[train_df['label'] == 0]['label'])
 
-class_weights = torch.tensor([merge_class_weight, not_merge_class_weight], dtype=torch.float).to(device)
-#%%
-print(f"""
-## Length of dataset:
-Length of training set: {len(train_df)}
-Length of test set: {len(test_df)}
+    class_weights = torch.tensor([merge_class_weight, not_merge_class_weight], dtype=torch.float).to(device)
+    #%%
+    print(f"""
+    ## Length of dataset:
+    Length of training set: {len(train_df)}
+    Length of test set: {len(test_df)}
+    
+    ## Distribution of label:
+    Number of merge in training set: {len(train_df[train_df['label'] == 1]['label'])}
+    Number of not-merge in training set: {len(train_df[train_df['label'] == 0]['label'])}
+    Class weights: {class_weights}
+    
+    Number of merge in test set: {len(test_df[test_df['label'] == 1]['label'])}
+    Number of not-merge in test set: {len(test_df[test_df['label'] == 0]['label'])}
+    """)
+    #%%
 
-## Distribution of label:
-Number of merge in training set: {len(train_df[train_df['label'] == 1]['label'])}
-Number of not-merge in training set: {len(train_df[train_df['label'] == 0]['label'])}
-Class weights: {class_weights}
+    def get_tfidf_embeddings(sentence_list):
+        if not type(sentence_list) == list:
+            sentence_list = [sentence_list]
+        embeddings = vectorizer.transform(sentence_list)
+        return embeddings.toarray()
 
-Number of merge in test set: {len(test_df[test_df['label'] == 1]['label'])}
-Number of not-merge in test set: {len(test_df[test_df['label'] == 0]['label'])}
-""")
-#%%
+    if embedding_type == 'tfidf':
+        train_corpus = [sentence for sentences in train_df['sentences'] for sentence in sentences]
 
-def get_tfidf_embeddings(sentence_list):
-    if not type(sentence_list) == list:
-        sentence_list = [sentence_list]
-    embeddings = vectorizer.transform(sentence_list)
-    return embeddings.toarray()
+        vectorizer = TfidfVectorizer(max_features=input_dim, stop_words='english')
+        vectorizer.fit(train_corpus)
 
-if embedding_type == 'tfidf':
-    train_corpus = [sentence for sentences in train_df['sentences'] for sentence in sentences]
-
-    vectorizer = TfidfVectorizer(max_features=input_dim, stop_words='english')
-    vectorizer.fit(train_corpus)
-
-    print("Train Sentence: ")
-    train_df['embeddings'] = train_df['sentences'].progress_apply(get_tfidf_embeddings)
-    print("Test Sentence: ")
-    test_df['embeddings'] = test_df['sentences'].progress_apply(get_tfidf_embeddings)
-    print("End Getting Tfidf Embeddings")
-#%%
-if embedding_type == 'tfidf':
+        print("Train Sentence: ")
+        train_df['embeddings'] = train_df['sentences'].progress_apply(get_tfidf_embeddings)
+        print("Test Sentence: ")
+        test_df['embeddings'] = test_df['sentences'].progress_apply(get_tfidf_embeddings)
+        print("End Getting Tfidf Embeddings")
+    #%%
+#if embedding_type == 'tfidf':
     train_dataset = GraphDataLoader(train_df, 10)
     test_dataset = GraphDataLoader(test_df, 10)
 else:
+
+    print("BERT will be used for embedding!!")
+
     train_csv = 'data/processed/embedded_labeled_train.csv'
     test_csv = 'data/processed/embedded_labeled_test.csv'
 
