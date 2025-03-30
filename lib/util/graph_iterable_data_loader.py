@@ -23,7 +23,6 @@ class GraphIterableDataset(torch.utils.data.IterableDataset):
             row['embeddings'] = eval(row['embeddings'], env)
         except Exception:
             row['embeddings'] = row['embeddings']
-
         return self.graph_generator(row)
 
     def __iter__(self):
@@ -31,3 +30,8 @@ class GraphIterableDataset(torch.utils.data.IterableDataset):
         for chunk in pd.read_csv(self.csv_file, chunksize=self.chunk_size):
             for _, row in chunk.iterrows():
                 yield self.parse_row(row)
+
+    def __len__(self):
+        # CSV dosyasındaki toplam satır sayısını döndürür (başlık satırını çıkarır)
+        with open(self.csv_file, 'r', encoding='utf-8') as f:
+            return sum(1 for line in f) - 1
