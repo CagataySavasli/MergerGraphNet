@@ -1,11 +1,7 @@
-#%%
+# %%
 from lib.config.config_loader import ConfigLoader
-
 from transformers import AutoTokenizer, AutoModel
-from nltk.tokenize import sent_tokenize
 from tqdm import tqdm
-
-
 import torch
 import numpy as np
 import pandas as pd
@@ -21,45 +17,43 @@ model = AutoModel.from_pretrained(config['embedding']['model_name'])
 
 start_idx = int(sys.argv[1])
 end_idx = int(sys.argv[2])
-#%%
+
 print(f"Preprocessing {start_idx}-{end_idx}...")
 df = pd.read_csv('./data/processed/reports_labeled.csv')
-
 df = df.loc[start_idx:end_idx].copy()
-
 df.reset_index(drop=True, inplace=True)
-df['sentences'] = df['mda'].progress_apply(lambda x: sent_tokenize(x))
-df.drop('mda', axis=1, inplace=True)
-#%%
-def get_finbert_embeddings(texts) -> np.ndarray:
-    """
-    Verilen cümle listesindeki metinler için FinBERT embedding'lerini hesaplar.
-    Her metin için, modelin son hidden state çıktısındaki token embedding'lerinin ortalaması alınır.
 
-    Parametreler:
-      texts: str tipinde öğeler içeren bir liste.
+
+# %%
+def get_finbert_embedding(text: str) -> np.ndarray:
+    """
+    Verilen metin için FinBERT embedding'ini, akademik çalışmalarda sıklıkla tercih edilen
+    pooler_output (CLS temsili) kullanarak hesaplar. Sonuç, hafıza kullanımını azaltmak için float16 tipinde döndürülür.
+
+    Parametre:
+      text: İşlenecek tam metin (str).
 
     Returns:
-      texts listesindeki her bir metin için hesaplanmış embedding'lerin bulunduğu
-      (n_metinsayısı, hidden_dim) boyutunda numpy dizisi.
+      text için hesaplanmış, (hidden_dim,) boyutunda float16 tipinde bir numpy array.
     """
-    if not type(texts) == list:
-        texts = [texts]
-    # Tokenize işlemi: tüm metinleri aynı anda tokenize edip, padding uyguluyoruz.
-    inputs = tokenizer(texts, return_tensors="pt", truncation=True, padding=True, max_length=512)
-
-    # Modeli değerlendirme modunda çalıştır
+    # Metni token'lara ayırırken truncation ve padding uygulanıyor.
+    inputs = tokenizer(text, return_tensors="pt", truncation=True, padding=True, max_length=512)
     with torch.no_grad():
         outputs = model(**inputs)
+    # Pooler_output, modelin cümlenin genel bilgisini içeren temsili olarak verilir.
+    embedding = outputs.pooler_output.squeeze(0).cpu().numpy().astype(np.float16)
+    return embedding
 
-    # Her metin için token embedding'lerinin ortalamasını alıyoruz.
-    embeddings = outputs.last_hidden_state.mean(dim=1).cpu().numpy()
-    return embeddings
-#%%
+
+# %%
 print("Start embedding...")
-df['embeddings'] = df['sentences'].progress_apply(get_finbert_embeddings)
-#%%
+# Her rapor için tam metin üzerinden tek bir embedding hesaplanıyor.
+df['embedding'] = df['mda'].progress_apply(get_finbert_embedding)
+# Belleği daha verimli kullanmak için, artık ihtiyaç duyulmayan orijinal metni kaldırıyoruz.
+# df.drop('mda', axis=1, inplace=True)
+
+# %%
 print("Saving embeddings...")
-df.to_json(f'./data/sep/embeddings_labeled_{start_idx}_{end_idx}.json', orient='records')
-#%%
+# Parquet formatı, JSON'a göre daha verimli disk kullanımı sağlar.
+df.to_parquet(f'./data/sep/embeddings_labeled_{start_idx}_{end_idx}.parquet', index=False)
 print("Done!")
