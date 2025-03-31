@@ -31,9 +31,6 @@ Functionality:
 Note:
 - This script is CPU-based by default (device='cpu'), but you can enable CUDA if available.
 - Hyperparameters (batch_size, window size, input dimension, etc.) are partially read from the YAML config.
-
-Author: Your Name
-Date: 2025-03-31
 """
 
 # %% [Imports]
