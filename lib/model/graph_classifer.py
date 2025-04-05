@@ -1,6 +1,6 @@
 import torch
 import torch.nn as nn
-
+import torch.nn.functional as F
 from torch_geometric.nn import GATConv, GCNConv, global_mean_pool, GlobalAttention
 from torch_geometric.utils import to_dense_batch
 from torch.nn.utils.rnn import pack_padded_sequence
