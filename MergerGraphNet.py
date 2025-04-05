@@ -83,6 +83,7 @@ hidden_dim_3 = config['models']['hidden_dim_3']
 # %% [CLI Arguments]
 model_name = sys.argv[1]  # e.g., 'GraphResidualClassifier'
 embedding_type = sys.argv[2]  # e.g., 'tfidf'
+learning_rate = float(sys.argv[3]) if len(sys.argv) > 3 else 0.0005
 
 # %% [Data Loading & Preprocessing]
 print("Start Preprocess")
@@ -297,10 +298,11 @@ elif model_name == 'GraphResidualClassifier':
 else:
     raise ValueError(f"Unsupported model name: {model_name}")
 
-optimizer = optim.Adam(model.parameters(), lr=0.0005)
+optimizer = optim.Adam(model.parameters(), lr=learning_rate)
 criterion = nn.CrossEntropyLoss(weight=class_weights)
 
 print("Start Training")
+print(f"Model: {model_name}, Embedding Type: {embedding_type}, Learning Rate: {learning_rate}")
 num_epochs = 15
 for epoch in range(1, num_epochs + 1):
     loss = train()
