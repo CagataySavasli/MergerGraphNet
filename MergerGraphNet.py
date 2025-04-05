@@ -61,6 +61,7 @@ from lib.util.graph_data_loader import GraphDataLoader
 from lib.util.graph_iterable_data_loader import GraphIterableDataset
 from lib.model.graph_classifer import (
     GraphClassifier,
+    MultiheadGraphClassifier,
     GraphResidualClassifier,
     GraphLSTMClassifier,
     GraphTransClassifier
@@ -270,6 +271,13 @@ if model_name == 'GraphClassifier':
         hidden_dim_2=hidden_dim_2,
         output_dim=2
     ).to(device)
+elif model_name == 'MultiheadGraphClassifier':
+    model = MultiheadGraphClassifier(
+        input_dim=input_dim,
+        hidden_dim_1=hidden_dim_1,
+        hidden_dim_2=hidden_dim_2,
+        output_dim=2
+    )
 elif model_name == 'GraphLSTMClassifier':
     model = GraphLSTMClassifier(
         input_dim=input_dim,
