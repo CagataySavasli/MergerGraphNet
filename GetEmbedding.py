@@ -93,7 +93,7 @@ def get_finbert_embedding(texts, batch_size: int = 256):
 
 print("Generating embeddings...")
 # For each row, compute embeddings for all sentences in 'sentences'.
-df['embedding'] = df['sentences'].progress_apply(get_finbert_embedding)
+df['embeddings'] = df['sentences'].progress_apply(get_finbert_embedding)
 
 # Save results in Parquet format for efficient disk usage and fast I/O.
 output_file = f'./data/sep/embeddings_labeled_{start_idx}_{end_idx}.parquet'
