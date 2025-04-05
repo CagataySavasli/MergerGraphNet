@@ -155,12 +155,16 @@ else:
     # Hardcoded class weights for demonstration; adjust as needed.
     class_weights = torch.tensor([4.488888888888889, 1.286624203821656], dtype=torch.float).to(device)
 
-    # CSV files that contain pre-embedded BERT representations
-    train_csv = 'data/processed/embedded_labeled_train.csv'
-    test_csv = 'data/processed/embedded_labeled_test.csv'
+    df = pd.read_parquet('./data/processed/embedded_labeled.parquet')
+    df.reset_index(drop=True, inplace=True)
 
-    train_dataset = GraphIterableDataset(train_csv, chunk_size=128, n=10)
-    test_dataset = GraphIterableDataset(test_csv, chunk_size=128, n=10)
+    # Separate into train/test based on 'year'
+    train_df = df[df['year'] <= 2019].copy().reset_index(drop=True)
+    test_df = df[df['year'] > 2019].copy().reset_index(drop=True)
+
+    # Create graph data sets
+    train_dataset = GraphDataLoader(train_df, n=10)
+    test_dataset = GraphDataLoader(test_df, n=10)
 
 # %% [DataLoader Creation]
 train_loader = DataLoader(train_dataset, batch_size=16)
