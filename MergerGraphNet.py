@@ -42,6 +42,7 @@ import torch.nn as nn
 import torch.optim as optim
 import numpy as np
 import pandas as pd
+import polars as pl
 
 from tqdm import tqdm
 from sklearn.feature_extraction.text import TfidfVectorizer
@@ -155,7 +156,8 @@ else:
     # Hardcoded class weights for demonstration; adjust as needed.
     class_weights = torch.tensor([4.488888888888889, 1.286624203821656], dtype=torch.float).to(device)
 
-    df = pd.read_parquet('./data/processed/embedded_labeled.parquet')
+    df = pl.read_parquet('./data/processed/embedded_labeled.parquet')
+    df = df.to_pandas()
     df.reset_index(drop=True, inplace=True)
 
     # Separate into train/test based on 'year'
