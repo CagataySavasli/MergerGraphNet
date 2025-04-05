@@ -28,6 +28,7 @@ for idx in range(0, 13100, 100):
 # Birleştirilmiş DataFrame'i oluştur
 if founds:
     merged_df = pd.concat(founds, ignore_index=True)
+    merged_df.reset_index(drop=True, inplace=True)
     merged_df.to_parquet(train_csv, index=False)
     print(f"Merged DataFrame saved to {train_csv}")
 
