@@ -1,4 +1,5 @@
 import pandas as pd
+from lib.database.database_connector import DatabaseConnector
 import datetime
 import os
 
@@ -8,15 +9,20 @@ class Preprocessor:
 
         self.data = data
 
-        self.path_ThomsonRouter = './data/auxiliary/thomson_routers_merger/'
-        self.data_ThomsonRouter = self.load_trm_data()
-
         self.chunk_size = 3 #Mounth
         self.added_time = datetime.timedelta(self.chunk_size * (365/12))
 
         self.minimum_token_limit = 100
 
         self.last_accapted_date = None
+
+        self.base_dir = os.path.dirname(os.path.abspath(__file__).split("lib")[0])
+
+        self.db_path = os.path.join(self.base_dir, "data", "data.db")
+        self.db = DatabaseConnector(self.db_path)
+
+        self.path_ThomsonRouter = os.path.join(base_dir, "data", "auxiliary", "thomson_routers_merger")
+        self.data_ThomsonRouter = self.load_trm_data()
 
 
     def preprocess(self):
@@ -37,7 +43,7 @@ class Preprocessor:
         for file_name in sorted(os.listdir(self.path_ThomsonRouter)):
             if not file_name.endswith('.xlsx'): continue
             print(file_name)
-            frame.append(pd.read_excel(self.path_ThomsonRouter+file_name))
+            frame.append(pd.read_excel(self.path_ThomsonRouter+"/"+file_name))
 
         df_ThomReuters = pd.concat(frame, ignore_index=True)
         last_merge_date = sorted(df_ThomReuters['Date Announced'])[-1]
@@ -72,10 +78,14 @@ class Preprocessor:
     def main(self):
         self.label()
         self.preprocess()
-        self.data.to_csv('./data/processed/reports.csv', index=False)
+        self.db.create_table_with_dataframes("reports", self.data)
+        # self.data.to_csv('./data/processed/reports.csv', index=False)
 
 if __name__ == '__main__':
-    data = pd.read_csv('./data/raw/reports.csv')
+    base_dir = os.path.dirname(os.path.abspath(__file__).split("lib")[0])
+    data_path = os.path.join(base_dir, "data", "raw", "reports.csv")
+
+    data = pd.read_csv(data_path)
 
     preprocessor = Preprocessor(data)
     preprocessor.main()
