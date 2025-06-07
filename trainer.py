@@ -9,6 +9,7 @@ from lib.model.not_tuned.gobert import GoBERT
 from lib.database.sqlite_dataset import SQLiteDataset
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, confusion_matrix
 from tqdm import tqdm
+import json
 import sys
 
 model_type = sys.argv[1]
@@ -74,6 +75,19 @@ optimizer = optim.Adam(model.parameters(), lr=1e-5)
 
 epochs = 50
 print("Starting training...")
+all_results = {
+    'epoch': [],
+    'train_loss': [],
+    'test_loss': [],
+    'test_acc': [],
+    'test_precision': [],
+    'test_recall': [],
+    'test_f1': [],
+    'tp': [],
+    'tn': [],
+    'fp': [],
+    'fn': []
+}
 for epoch in range(1, epochs+1):
     print("Starting epoch:", epoch)
     model.train()
@@ -103,6 +117,9 @@ for epoch in range(1, epochs+1):
 
     avg_loss = total_loss / len(train_ds)
     print(f"Epoch {epoch}/{epochs} - Train Loss: {avg_loss:.4f}")
+
+    all_results['epoch'].append(epoch)
+    all_results['train_loss'].append(avg_loss)
 
     print("Evaluating model...")
     model.eval()
@@ -134,3 +151,17 @@ for epoch in range(1, epochs+1):
 
     tn, fp, fn, tp = confusion_matrix(y_reals, y_preds).ravel()
     print(f"Epoch {epoch}/{epochs} - Test | Accuracy: {acc:.4f}, Precision: {prec:.4f}, Recall: {rec:.4f}, F1: {f1:.4f} | TP: {tp}, FP: {fp}, FN: {fn}, TN: {tn}")
+
+
+
+    all_results['test_acc'].append(acc)
+    all_results['test_precision'].append(prec)
+    all_results['test_recall'].append(rec)
+    all_results['test_f1'].append(f1)
+    all_results['tp'].append(tp)
+    all_results['tn'].append(tn)
+    all_results['fp'].append(fp)
+    all_results['fn'].append(fn)
+
+with open(f"output/{model_type}_results.json", "w", encoding="utf-8") as f:
+    json.dump(all_results, f, ensure_ascii=False, indent=2)
