@@ -1,3 +1,6 @@
 *.xlsx
 *.csv
 *.xml
+*.json
+*.db
+*.iml
