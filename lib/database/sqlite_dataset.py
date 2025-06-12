@@ -1,6 +1,7 @@
 from torch.utils.data import Dataset
 from lib.database.database_connector import DatabaseConnector
 from lib.data.graph_generator import GraphGenerator
+import sqlite3
 import json
 
 class SQLiteDataset(Dataset):
@@ -19,6 +20,7 @@ class SQLiteDataset(Dataset):
         end_date=None,
         transform=None
     ):
+        self.db_path = db_path
         self.db = DatabaseConnector(db_path)
         self.cursor = self.db.cursor
         self.table_name = table_name
@@ -75,6 +77,21 @@ class SQLiteDataset(Dataset):
             data = self.graph_generator.generate_graph(data)
 
         return data, label
+
+    def __getstate__(self):
+        state = self.__dict__.copy()
+        # Unpickleable objeleri kaldır
+        state.pop('db', None)
+        state.pop('cursor', None)
+        return state
+
+    def __setstate__(self, state):
+        # Diğer tüm attribute’ları geri yükle
+        self.__dict__.update(state)
+        # Her worker kendi bağlantısını açsın
+        conn = sqlite3.connect(self.db_path, check_same_thread=False)
+        self.db = conn
+        self.cursor = conn.cursor()
 
     def close(self):
         self.db.close_connection()
