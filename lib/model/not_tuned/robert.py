@@ -2,7 +2,6 @@ import torch
 import torch.nn as nn
 from torch.nn.utils.rnn import pad_sequence, pack_padded_sequence
 
-# --- Model Definition ---
 class RoBERT(nn.Module):
     def __init__(self, input_dim=768, hidden_dim=128, num_layers=1, bidirectional=False):
         super().__init__()
