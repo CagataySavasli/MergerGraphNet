@@ -53,11 +53,6 @@ class GraphGenerator(Dataset):
         edge_index = torch.tensor(edge_list, dtype=torch.long).t().contiguous()
         edge_attr = torch.tensor(edge_attr, dtype=torch.float32).view(-1, 1)
 
-        # if not edge_index.any():
-        #     print("Empty edge list")
-        # if not edge_attr.any():
-        #     print("Empty edge list")
-
         data = Data(x=x, edge_index=edge_index, edge_attr=edge_attr)
         return data
 
