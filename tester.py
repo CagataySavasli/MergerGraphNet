@@ -33,7 +33,7 @@ def main():
 
     model_type = sys.argv[1]
     GRAPH_VERSION = True if model_type == "gobert" else False
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    device = torch.device("cpu")#torch.device("cuda" if torch.cuda.is_available() else "cpu")
     print(f"Using device: {device}")
 
     # Define date for test split start (data after validation end date)

@@ -20,10 +20,10 @@ num_0_label = 6539
 
 model_type = sys.argv[1]
 GRAPH_VERSION = True if model_type == "gobert" else False
+torch.cuda.empty_cache()
 
-def collate_fn(batch):
-    # batch: list of tuples (features_list, label)
-    if GRAPH_VERSION:
+def collate_fn(batch, graph_version=False):
+    if graph_version:
         xs = [example[0] for example in batch]
         xs = Batch.from_data_list(xs)
     else:
@@ -61,7 +61,7 @@ def main():
         batch_size=8,
         shuffle=True,
         num_workers=8,
-        pin_memory=False,
+        pin_memory=True,
         collate_fn=collate_fn
     )
     test_loader = DataLoader(
@@ -69,20 +69,21 @@ def main():
         batch_size=8,
         shuffle=False,
         num_workers=8,
-        pin_memory=False,
+        pin_memory=True,
         collate_fn=collate_fn
     )
 
     # --- Training Setup ---
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     if model_type == "robert":
-        model = RoBERT(input_dim=768, hidden_dim=128, num_layers=1, bidirectional=False).to(device)
+        model = RoBERT(input_dim=768, hidden_dim=128, num_layers=1, bidirectional=False)
     elif model_type == "tobert":
-        model = ToBERT(input_dim=768, num_heads=8, num_layers=2, dim_feedforward=2048).to(device)
+        model = ToBERT(input_dim=768, num_heads=8, num_layers=2, dim_feedforward=2048)
     else:
-        model = GoBERT(input_dim=768, hidden_dim_1=256, hidden_dim_2=64, output_dim=1).to(device)
+        model = GoBERT(input_dim=768, hidden_dim_1=256, hidden_dim_2=64, output_dim=1)
 
     # Loss with pos_weight to penalize minority class less
+    model.to(device)
     pos_weight = torch.tensor(num_0_label / num_1_label).to(device)
     criterion = nn.BCEWithLogitsLoss(pos_weight=pos_weight).to(device)
     optimizer = optim.Adam(model.parameters(), lr=5e-5)
