@@ -1,11 +1,13 @@
 import pandas as pd
 import re
 from sec_cik_mapper import StockMapper  # Explicitly import the CIK lookup function
-from edgar.company import Company
+# from edgar.company import Company
+from edgartools import Company
 from sec_parsers import Filing, download_sec_filing, set_headers
 from sec_downloaders import SEC_Downloader
 import sec_parser as sp
 from typing import List, Tuple
+
 
 class DataDownloader:
     def __init__(self, config: dict, output_file: str):
@@ -26,11 +28,11 @@ class DataDownloader:
         self.all_rows = []
 
         # Set headers for HTTP requests
-        self.set_headers(self.config["developer"], self.config["email"])
+        self.set_headers(self.config["project"]["developer"], self.config["project"]["email"])
 
         # Instantiate the SEC downloader and set headers
         self.downloader = SEC_Downloader()
-        self.downloader.set_headers(self.config["developer"], self.config["email"])
+        self.downloader.set_headers(self.config["project"]["developer"], self.config["project"]["email"])
 
     def preprocess_historical_sp500(self):
         self.df_sp500['year'] = self.df_sp500['date'].apply(lambda x: int(x.split('-')[0]))
