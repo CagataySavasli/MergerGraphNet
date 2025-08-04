@@ -6,7 +6,7 @@ import numpy as np
 from torch.utils.data import Dataset
 from torch_geometric.data import Data
 from tqdm.auto import tqdm
-
+import torch
 
 def preprocess_dataframe(df):
     """
