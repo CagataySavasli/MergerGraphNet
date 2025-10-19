@@ -46,12 +46,12 @@ Total: **8,905 reports**, with ~17% merger cases.
 ```bash
 git clone https://github.com/CagataySavasli/MergerGraphNet.git
 cd MergerGraphNet
-pip install -r requirements.txt
+poetry install
 ```
 
 ---
 
 ## Contributors
 
-- Ahmet Cagatay Savasli – Methodology, Software, Writing
-- Emre Sefer – Conceptualization, Methodology, Writing
+- [Ahmet Cagatay Savasli](https://cagataysavasli.github.io/) – Methodology, Software, Writing
+- [Emre Sefer](https://seferlab.github.io/) – Conceptualization, Methodology, Writing
